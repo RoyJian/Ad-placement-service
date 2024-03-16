@@ -11,6 +11,8 @@ func InitRouter() *gin.Engine {
 	apiV1 := router.Group("/api/v1")
 	{
 		apiV1.GET("/health", v1.GetHealth)
+		apiV1.POST("/ad", v1.CreateAd)
+
 	}
 	return router
 }
