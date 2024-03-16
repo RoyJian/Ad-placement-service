@@ -1,0 +1,12 @@
+version: '3.1'
+services:
+  ad-mongodb:
+    image: mongo
+    restart: always
+    volumes:
+      - ./db:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ADMIN}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+    ports:
+      - "127.0.0.1:27017:27017"
