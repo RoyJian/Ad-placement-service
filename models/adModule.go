@@ -19,9 +19,14 @@ type Condition struct {
 	AgeEnd   int      `json:"ageEnd"   binding:"omitempty,gte=1,gtfield=AgeStart,lte=100" bson:"ageEnd"`
 	Country  []string `json:"country"  binding:"omitempty,dive,iso3166_1_alpha2" bson:"country"`
 	Platform []string `json:"platform" binding:"omitempty,dive,oneof=android ios web" bson:"platform"`
-	Gender   string   `json:"gender"   binding:"omitempty,oneof=M F FM" bson:"gender"`
+	Gender   string   `json:"gender"   binding:"omitempty,oneof=M F" bson:"gender"`
 }
-type QueryParams struct {
+
+type AdQueryParams struct {
+	Gender   string `form:"gender" binding:"omitempty,oneof=M F"`
+	Age      int    `form:"age" binding:"omitempty,gte=1,lte=100"`
+	Country  string `form:"country" binding:"omitempty,iso3166_1_alpha2"`
+	Platform string `form:"platform" binding:"omitempty,oneof=android ios web"`
 }
 
 func (ad *Advertisement) InsertDb() error {
@@ -38,5 +43,11 @@ func (ad *Advertisement) InsertDb() error {
 func (condition *Condition) Init() {
 	condition.AgeStart = 1
 	condition.AgeEnd = 100
-	condition.Gender = "FM"
+}
+
+func (adQueryParams *AdQueryParams) Query() {
+	//ctx := context.TODO()
+	//collection := mongodb.GetCollection("advertisements")
+	//filter := bson.D{}
+	//collection.Find(ctx, filter)
 }
