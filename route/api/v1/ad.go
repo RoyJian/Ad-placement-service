@@ -20,5 +20,5 @@ func CreateAd(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
 	}
-	c.JSON(http.StatusOK, "ad create success")
+	c.JSON(http.StatusOK, "Create Ad success")
 }

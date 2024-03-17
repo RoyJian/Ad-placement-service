@@ -15,3 +15,8 @@ type Condition struct {
 	Platform []string `json:"platform" binding:"omitempty,dive,oneof=android ios web"`
 	Gender   string   `json:"gender"   binding:"omitempty,oneof=M F"`
 }
+
+func (*Advertisement) InsertDb() error {
+	
+	return nil
+}

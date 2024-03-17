@@ -1,0 +1,5 @@
+package mongodb
+
+func InitDB() {
+
+}
