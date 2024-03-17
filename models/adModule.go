@@ -1,19 +1,17 @@
 package models
 
-import (
-	"Ad_Placement_Service/enums"
-)
+import "time"
 
 type Advertisement struct {
-	Title      string    `json:"title" binding:"required"`
-	StartAt    string    `json:"startAt"`
-	EndAt      string    `json:"endAt"`
-	Conditions Condition `json:"conditions"`
+	Title      string     `json:"title" binding:"required"`
+	StartAt    *time.Time `json:"startAt" binding:"required"`
+	EndAt      *time.Time `json:"endAt" binding:"required"`
+	Conditions Condition  `json:"conditions"`
 }
 type Condition struct {
-	AgeStart int              `json:"ageStart"`
-	AgeEnd   int              `json:"ageEnd"`
-	Country  []string         `json:"country"`
-	Platform []enums.Platform `json:"platform"`
-	Gender   enums.Gender     `json:"gender"`
+	AgeStart int      `json:"ageStart" binding:"omitempty,gte=1,lte=100"`
+	AgeEnd   int      `json:"ageEnd"   binding:"omitempty,gte=1,gtfield=AgeStart,lte=100"`
+	Country  []string `json:"country"  binding:"omitempty,dive,iso3166_1_alpha2"`
+	Platform []string `json:"platform" binding:"omitempty,dive,oneof=android ios web"`
+	Gender   string   `json:"gender"   binding:"omitempty,oneof=M F"`
 }
