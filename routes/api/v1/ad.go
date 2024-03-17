@@ -13,11 +13,11 @@ func CreateAd(c *gin.Context) {
 	var ad models.Advertisement
 	if err := c.ShouldBindWith(&ad, binding.JSON); err != nil {
 		log.Println(err)
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 	if err := controllers.CreateAd(ad); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, "Create Ad success")

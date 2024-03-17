@@ -3,7 +3,6 @@ package models
 import (
 	"Ad_Placement_Service/service/mongodb"
 	"context"
-	"log"
 	"time"
 )
 
@@ -25,8 +24,7 @@ func (ad *Advertisement) InsertDb() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	collection := mongodb.GetCollection("advertisements")
-	res, err := collection.InsertOne(ctx, ad)
-	log.Println(res)
+	_, err := collection.InsertOne(ctx, ad)
 	if err != nil {
 		return err
 	}
