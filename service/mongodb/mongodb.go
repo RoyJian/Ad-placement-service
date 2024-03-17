@@ -12,11 +12,13 @@ import (
 var Client *mongo.Client
 
 func Init(ctx context.Context) error {
+	var cred options.Credential
 	dbHost := os.Getenv("MONGODB_HOST")
 	dbPort := os.Getenv("MONGODB_PORT")
-
+	cred.Username = os.Getenv("MONGODB_ADMIN")
+	cred.Password = os.Getenv("MONGODB_PASSWORD")
 	uri := fmt.Sprintf("mongodb://%s:%s", dbHost, dbPort)
-	connOption := options.Client().ApplyURI(uri)
+	connOption := options.Client().ApplyURI(uri).SetAuth(cred)
 	client, err := mongo.Connect(ctx, connOption)
 	if err != nil {
 		return err
