@@ -8,6 +8,7 @@ func RegisterRouter(r *gin.Engine) {
 	{
 		apiV1.GET("/health", v1.GetHealth)
 		apiV1.POST("/ad", v1.CreateAd)
+		apiV1.GET("/ad", v1.GetPlacementAd)
 
 	}
 	return
