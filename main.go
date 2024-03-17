@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Ad_Placement_Service/router"
+	"Ad_Placement_Service/route"
 	"fmt"
 	"github.com/joho/godotenv"
 	"log"
@@ -16,7 +16,7 @@ func main() {
 	}
 
 	// Init service
-	r := router.InitRouter()
+	r := route.InitRouter()
 	port := fmt.Sprintf(":%s", os.Getenv("GIN_PORT"))
 	err = r.Run(port)
 	if err != nil {

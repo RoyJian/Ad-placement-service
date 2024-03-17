@@ -1,6 +1,6 @@
-package router
+package route
 
-import "Ad_Placement_Service/router/api/v1"
+import "Ad_Placement_Service/route/api/v1"
 import "github.com/gin-gonic/gin"
 
 func InitRouter() *gin.Engine {

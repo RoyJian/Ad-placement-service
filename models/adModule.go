@@ -13,7 +13,7 @@ type Advertisement struct {
 type Condition struct {
 	AgeStart int              `json:"ageStart"`
 	AgeEnd   int              `json:"ageEnd"`
-	Country  []enums.Country  `json:"country"`
+	Country  []string         `json:"country"`
 	Platform []enums.Platform `json:"platform"`
 	Gender   enums.Gender     `json:"gender"`
 }
