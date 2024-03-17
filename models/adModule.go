@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type Advertisement struct {
 	Title      string     `json:"title" binding:"required"`
@@ -16,7 +18,7 @@ type Condition struct {
 	Gender   string   `json:"gender"   binding:"omitempty,oneof=M F"`
 }
 
-func (*Advertisement) InsertDb() error {
-	
+func (ad *Advertisement) InsertDb() error {
+
 	return nil
 }

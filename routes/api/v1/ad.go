@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"Ad_Placement_Service/controller"
+	"Ad_Placement_Service/controllers"
 	"Ad_Placement_Service/models"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -16,7 +16,7 @@ func CreateAd(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
 	}
-	if err := controller.CreateAd(ad); err != nil {
+	if err := controllers.CreateAd(ad); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
 	}

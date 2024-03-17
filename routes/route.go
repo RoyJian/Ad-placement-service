@@ -1,9 +1,9 @@
-package route
+package routes
 
-import "Ad_Placement_Service/route/api/v1"
+import "Ad_Placement_Service/routes/api/v1"
 import "github.com/gin-gonic/gin"
 
-func SetRouter(r *gin.Engine) {
+func RegisterRouter(r *gin.Engine) {
 	apiV1 := r.Group("/api/v1")
 	{
 		apiV1.GET("/health", v1.GetHealth)

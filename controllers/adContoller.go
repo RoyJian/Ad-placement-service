@@ -1,4 +1,4 @@
-package controller
+package controllers
 
 import (
 	"Ad_Placement_Service/models"
