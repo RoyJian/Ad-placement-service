@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-var Client *mongo.Client
+var client *mongo.Client
 
 func Init(ctx context.Context) error {
 	var cred options.Credential
@@ -19,24 +19,24 @@ func Init(ctx context.Context) error {
 	cred.Password = os.Getenv("MONGODB_PASSWORD")
 	uri := fmt.Sprintf("mongodb://%s:%s", dbHost, dbPort)
 	connOption := options.Client().ApplyURI(uri).SetAuth(cred)
-	client, err := mongo.Connect(ctx, connOption)
+	c, err := mongo.Connect(ctx, connOption)
 	if err != nil {
 		return err
 	}
-	if err := client.Ping(ctx, nil); err != nil {
+	if err := c.Ping(ctx, nil); err != nil {
 		return err
 	}
 	log.Print("Ping mongodb success")
-	Client = client
+	client = c
 	return nil
 }
 func GetCollection(collection string) *mongo.Collection {
 	database := os.Getenv("MONGODB_DATABASE")
-	return Client.Database(database).Collection(collection)
+	return client.Database(database).Collection(collection)
 }
 
 func Disconnect(ctx context.Context) {
-	if err := Client.Disconnect(ctx); err != nil {
+	if err := client.Disconnect(ctx); err != nil {
 		log.Fatal("Disconnect mongodb fail ", err)
 	}
 	log.Print("Disconnect mongodb success")
