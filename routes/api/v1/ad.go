@@ -33,5 +33,7 @@ func GetPlacementAd(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, queryErr.Error())
 		return
 	}
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, gin.H{
+		"items": res,
+	})
 }

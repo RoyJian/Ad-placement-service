@@ -4,10 +4,6 @@ import (
 	"Ad_Placement_Service/models"
 )
 
-type AdQueryRes struct {
-	item []models.Advertisement
-}
-
 func CreateAd(ad models.Advertisement) error {
 	if err := ad.InsertDb(); err != nil {
 		return err
@@ -15,8 +11,7 @@ func CreateAd(ad models.Advertisement) error {
 	return nil
 }
 
-func QueryAd(query models.AdQueryParams) (AdQueryRes, error) {
-	var res AdQueryRes
-
-	return res, nil
+func QueryAd(adQueryParams models.AdQueryParams) ([]models.Advertisement, error) {
+	res, err := adQueryParams.Query()
+	return res, err
 }

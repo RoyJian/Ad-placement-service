@@ -18,7 +18,7 @@ func Init(ctx context.Context) error {
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 	routes.RegisterRouter(router)
-	addr := fmt.Sprintf(":%s", os.Getenv("GIN_PORT"))
+	addr := fmt.Sprintf("%s:%s", os.Getenv("GIN_HOST"), os.Getenv("GIN_PORT"))
 	srv = &http.Server{
 		Addr:    addr,
 		Handler: router,
