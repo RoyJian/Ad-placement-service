@@ -31,6 +31,8 @@ type AdQueryParams struct {
 	Age      int    `form:"age" binding:"omitempty,gte=1,lte=100"`
 	Country  string `form:"country" binding:"omitempty,iso3166_1_alpha2"`
 	Platform string `form:"platform" binding:"omitempty,oneof=android ios web"`
+	Limit    int    `form:"limit,default=5" binding:"gte=1,lte=100"`
+	Offset   int    `form:"offset,default=0"`
 }
 
 func (ad *Advertisement) InsertDb() error {
@@ -87,7 +89,6 @@ func (adQueryParams *AdQueryParams) Query() ([]Advertisement, error) {
 			}}}},
 		})
 	}
-
 	// Filter Platform
 	if !reflect.ValueOf(adQueryParams.Platform).IsZero() {
 		agg = append(agg, bson.D{
@@ -97,6 +98,10 @@ func (adQueryParams *AdQueryParams) Query() ([]Advertisement, error) {
 			}}}},
 		})
 	}
+
+	agg = append(agg, bson.D{{"$skip", adQueryParams.Offset}}) // set query offset
+	agg = append(agg, bson.D{{"$limit", adQueryParams.Limit}}) // set query limit
+	agg = append(agg, bson.D{{"$sort", bson.D{{"endAt", 1}}}}) // sort query result
 
 	cursor, err := collection.Aggregate(ctx, agg)
 	if err != nil {
