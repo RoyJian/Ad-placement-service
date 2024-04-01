@@ -12,11 +12,14 @@ import (
 var client *mongo.Client
 
 func Init(ctx context.Context) error {
-	var cred options.Credential
 	dbHost := os.Getenv("MONGODB_HOST")
 	dbPort := os.Getenv("MONGODB_PORT")
-	cred.Username = os.Getenv("MONGODB_ADMIN")
-	cred.Password = os.Getenv("MONGODB_PASSWORD")
+	cred := options.Credential{
+		AuthMechanism: "SCRAM-SHA-1",
+		AuthSource:    os.Getenv("MONGODB_DATABASE"),
+		Username:      os.Getenv("MONGODB_ADMIN"),
+		Password:      os.Getenv("MONGODB_PASSWORD"),
+	}
 	uri := fmt.Sprintf("mongodb://%s:%s", dbHost, dbPort)
 	connOption := options.Client().ApplyURI(uri).SetAuth(cred)
 	c, err := mongo.Connect(ctx, connOption)
