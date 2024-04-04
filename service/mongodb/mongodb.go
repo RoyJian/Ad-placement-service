@@ -29,7 +29,7 @@ func Init(ctx context.Context) error {
 	if err := c.Ping(ctx, nil); err != nil {
 		return err
 	}
-	log.Print("Ping mongodb success")
+	log.Println("Ping mongodb success")
 	client = c
 	return nil
 }

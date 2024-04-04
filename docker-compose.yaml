@@ -1,12 +1,86 @@
-version: '3.1'
+version: '3.9'
 services:
-  ad-mongodb:
-    image: mongo
-    restart: always
-    volumes:
-      - ./db:/data/db
+  redis-node-1:
+    image: redis:7.2.3
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ADMIN}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    command: ["/tmp/build.sh", "$REDIS_HOST", "7001"]
+    volumes:
+      - ./config/redis/build.sh:/tmp/build.sh
+  redis-node-2:
+    image: redis:7.2.3
+    environment:
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    command: ["/tmp/build.sh", "$REDIS_HOST", "7002"]
+    volumes:
+      - ./config/redis/build.sh:/tmp/build.sh
+  redis-node-3:
+    image: redis:7.2.3
+    environment:
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    command: ["/tmp/build.sh", "$REDIS_HOST", "7003"]
+    volumes:
+      - ./config/redis/build.sh:/tmp/build.sh
+  redis-node-4:
+    image: redis:7.2.3
+    environment:
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    command: ["/tmp/build.sh", "$REDIS_HOST", "7004"]
+    volumes:
+      - ./config/redis/build.sh:/tmp/build.sh
+  redis-node-5:
+    image: redis:7.2.3
+    environment:
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    command: ["/tmp/build.sh", "$REDIS_HOST", "7005"]
+    volumes:
+      - ./config/redis/build.sh:/tmp/build.sh
+  redis-node-6:
+    image: redis:7.2.3
+    environment:
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    command: ["/tmp/build.sh", "$REDIS_HOST", "7006"]
+    volumes:
+      - ./config/redis/build.sh:/tmp/build.sh
+  redis-cluster-creator:
+    image: redis:7.2.3
+    environment:
+      REDIS_HOST: ${REDIS_HOST}
+      REDISCLI_AUTH: ${REDIS_PASSWORD}
+    command: "redis-cli --cluster create $REDIS_HOST:7001 $REDIS_HOST:7002 $REDIS_HOST:7003 $REDIS_HOST:7004 $REDIS_HOST:7005 $REDIS_HOST:7006 --cluster-replicas 1 --cluster-yes"
+    depends_on:
+      - redis-node-1
+      - redis-node-2
+      - redis-node-3
+      - redis-node-4
+      - redis-node-5
+      - redis-node-6
+      - redis-proxy
+  redis-proxy:
+    image: haproxy:3.0-dev6-alpine3.19
+    volumes:
+      - ./config/haproxy:/usr/local/etc/haproxy:ro
     ports:
-      - "127.0.0.1:${MONGODB_PORT}:27017"
+      - "8404:8404"
+      - "7001-7006:9001-9006"
+      - "7101-7106:9101-9106"
+    depends_on:
+      - redis-node-1
+      - redis-node-2
+      - redis-node-3
+      - redis-node-4
+      - redis-node-5
+      - redis-node-6
+  redis-insight:
+    container_name: redis-insight
+    image: redislabs/redisinsight:1.14.0
+    ports:
+      - "8001:8001"
+    depends_on:
+      - redis-proxy
