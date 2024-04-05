@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ad-placement-svc
+  labels:
+    app: backend-app
+spec:
+  selector:
+    app: backend-app
+  type: ClusterIP
+  ports:
+    - name: gin
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ad-placement-deployment
+  labels:
+    app: backend-app
+spec:
+  selector:
+    matchLabels:
+      app: backend-app
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: backend-app
+    spec:
+      containers:
+        - name: ad-placement-backend-app
+          image: localhost:5000/ad-placement-service-app
+          ports:
+            - containerPort: 3000
