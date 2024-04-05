@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/sync/singleflight"
 	"log"
 	"reflect"
 	"time"
@@ -38,6 +39,8 @@ type AdQueryParams struct {
 	Offset   int    `form:"offset,default=0"`
 }
 
+var group singleflight.Group
+
 func (ad *Advertisement) InsertDb() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -60,42 +63,50 @@ func (adQueryParams *AdQueryParams) generateKey() string {
 }
 
 func (adQueryParams *AdQueryParams) Query() ([]Advertisement, error) {
-	var res []Advertisement
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	// cache
-	adQueryParams.queryFromCache(ctx, &res)
-	if !reflect.ValueOf(res).IsZero() {
+	// Cache
+	res := adQueryParams.queryFromCache(ctx)
+	if !reflect.ValueOf(res).IsNil() {
 		log.Println("Cache hit")
 		return res, nil
 	}
-	// cache miss, query DB
-	err := adQueryParams.queryFromDB(ctx, &res)
+	// Cache miss, uses singleflight to avoid Hotspot Invalid
+	v, err, _ := group.Do(adQueryParams.generateKey(), func() (interface{}, error) {
+		res, err := adQueryParams.queryFromDB(ctx)
+		// Write to cache
+		adQueryParams.writeToCache(res)
+		return res, err
+	})
+
 	if err != nil {
 		return nil, err
 	}
-	defer adQueryParams.writeToCache(res)
-	return res, nil
+
+	return v.([]Advertisement), nil
 }
 
-func (adQueryParams *AdQueryParams) queryFromCache(ctx context.Context, res *[]Advertisement) {
+func (adQueryParams *AdQueryParams) queryFromCache(ctx context.Context) []Advertisement {
+	var res []Advertisement
 	var bytes []byte
 	key := adQueryParams.generateKey()
 	err := cache.Get(ctx, key).Scan(&bytes)
 	if err != nil {
 		log.Println("Cache miss")
-		return
+		return nil
 	}
-	err = json.Unmarshal(bytes, res)
+	err = json.Unmarshal(bytes, &res)
 	if err != nil {
 		log.Println("Parse json error", err)
+		return nil
 	}
+	return res
 }
 
-func (adQueryParams *AdQueryParams) queryFromDB(ctx context.Context, res *[]Advertisement) error {
-	collection := mongodb.GetCollection("advertisements")
+func (adQueryParams *AdQueryParams) queryFromDB(ctx context.Context) ([]Advertisement, error) {
+	var res []Advertisement
 	var agg = mongo.Pipeline{}
-
+	collection := mongodb.GetCollection("advertisements")
 	// Filter expired ads
 	agg = append(agg, bson.D{
 		{"$match", bson.D{
@@ -144,22 +155,22 @@ func (adQueryParams *AdQueryParams) queryFromDB(ctx context.Context, res *[]Adve
 
 	cursor, err := collection.Aggregate(ctx, agg)
 	if err != nil {
-		log.Fatal(err)
-		return err
+		log.Println(err)
+		return nil, err
 	}
-	if err := cursor.All(context.TODO(), res); err != nil {
-		log.Fatal(err.Error())
-		return err
+	if err := cursor.All(context.TODO(), &res); err != nil {
+		log.Println(err.Error())
+		return nil, err
 	}
-	return nil
+	return res, nil
 }
 
 func (adQueryParams *AdQueryParams) writeToCache(value []Advertisement) {
 	encodeValue, err := json.Marshal(value)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	if err := cache.Set(adQueryParams.generateKey(), encodeValue); err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 }
