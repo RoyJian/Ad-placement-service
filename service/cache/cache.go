@@ -6,6 +6,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"log"
 	"os"
+	"time"
 )
 
 var client *redis.ClusterClient
@@ -26,5 +27,19 @@ func Init(ctx context.Context) error {
 		panic(err)
 	}
 	log.Println("Ping redis success")
+	return nil
+}
+
+func Get(ctx context.Context, key string) *redis.StringCmd {
+	data := client.Get(ctx, key)
+	return data
+}
+
+func Set(key string, value interface{}) error {
+	ctx := context.Background()
+	if err := client.Set(ctx, key, value, 3*time.Hour).Err(); err != nil {
+		log.Fatal(err.Error())
+		return err
+	}
 	return nil
 }

@@ -1,8 +1,11 @@
 package models
 
 import (
+	"Ad_Placement_Service/service/cache"
 	"Ad_Placement_Service/service/mongodb"
 	"context"
+	"encoding/json"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -51,9 +54,45 @@ func (condition *Condition) Init() {
 	condition.AgeEnd = 100
 }
 
+func (adQueryParams *AdQueryParams) generateKey() string {
+	s := fmt.Sprintf("%+v", adQueryParams)
+	return s
+}
+
 func (adQueryParams *AdQueryParams) Query() ([]Advertisement, error) {
+	var res []Advertisement
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
+	// cache
+	adQueryParams.queryFromCache(ctx, &res)
+	if !reflect.ValueOf(res).IsZero() {
+		log.Println("Cache hit")
+		return res, nil
+	}
+	// cache miss, query DB
+	err := adQueryParams.queryFromDB(ctx, &res)
+	if err != nil {
+		return nil, err
+	}
+	defer adQueryParams.writeToCache(res)
+	return res, nil
+}
+
+func (adQueryParams *AdQueryParams) queryFromCache(ctx context.Context, res *[]Advertisement) {
+	var bytes []byte
+	key := adQueryParams.generateKey()
+	err := cache.Get(ctx, key).Scan(&bytes)
+	if err != nil {
+		log.Println("Cache miss")
+		return
+	}
+	err = json.Unmarshal(bytes, res)
+	if err != nil {
+		log.Println("Parse json error", err)
+	}
+}
+
+func (adQueryParams *AdQueryParams) queryFromDB(ctx context.Context, res *[]Advertisement) error {
 	collection := mongodb.GetCollection("advertisements")
 	var agg = mongo.Pipeline{}
 
@@ -106,13 +145,21 @@ func (adQueryParams *AdQueryParams) Query() ([]Advertisement, error) {
 	cursor, err := collection.Aggregate(ctx, agg)
 	if err != nil {
 		log.Fatal(err)
-		return nil, err
+		return err
 	}
-	var res []Advertisement
-	if err := cursor.All(context.TODO(), &res); err != nil {
+	if err := cursor.All(context.TODO(), res); err != nil {
 		log.Fatal(err.Error())
-		return nil, err
+		return err
 	}
-	return res, nil
+	return nil
+}
 
+func (adQueryParams *AdQueryParams) writeToCache(value []Advertisement) {
+	encodeValue, err := json.Marshal(value)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := cache.Set(adQueryParams.generateKey(), encodeValue); err != nil {
+		log.Fatal(err)
+	}
 }

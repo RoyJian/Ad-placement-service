@@ -15,10 +15,10 @@ func Init(ctx context.Context) error {
 	dbHost := os.Getenv("MONGODB_HOST")
 	dbPort := os.Getenv("MONGODB_PORT")
 	cred := options.Credential{
-		AuthMechanism: "SCRAM-SHA-1",
-		AuthSource:    os.Getenv("MONGODB_DATABASE"),
-		Username:      os.Getenv("MONGODB_ADMIN"),
-		Password:      os.Getenv("MONGODB_PASSWORD"),
+		//AuthMechanism: "SCRAM-SHA-1",
+		//AuthSource:    os.Getenv("MONGODB_DATABASE"),
+		Username: os.Getenv("MONGODB_ADMIN"),
+		Password: os.Getenv("MONGODB_PASSWORD"),
 	}
 	uri := fmt.Sprintf("mongodb://%s:%s", dbHost, dbPort)
 	connOption := options.Client().ApplyURI(uri).SetAuth(cred)
