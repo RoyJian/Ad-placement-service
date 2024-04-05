@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Ad_Placement_Service/service/cache"
 	"Ad_Placement_Service/service/http"
 	"Ad_Placement_Service/service/mongodb"
 	"context"
@@ -20,14 +21,19 @@ func main() {
 		return
 	}
 	go func() {
-		// Init mongoDB
+		// Init mongoDB service
 		if err := mongodb.Init(ctx); err != nil {
-			log.Fatal("start mongoDB service fail", err)
+			log.Fatal("start mongoDB service fail ", err)
+		}
+		// Init Redis service
+		if err := cache.Init(ctx); err != nil {
+			log.Fatal("start redis service fail! ", err)
 		}
 		// Init gin service
 		if err := http.Init(ctx); err != nil {
-			log.Fatal("Start http service fail!", err)
+			log.Fatal("Start http service fail! ", err)
 		}
+
 	}()
 	defer mongodb.Disconnect(ctx)
 	defer http.Shutdown(ctx)
