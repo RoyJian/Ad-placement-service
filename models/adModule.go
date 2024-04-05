@@ -173,4 +173,5 @@ func (adQueryParams *AdQueryParams) writeToCache(value []Advertisement) {
 	if err := cache.Set(adQueryParams.generateKey(), encodeValue); err != nil {
 		log.Println(err)
 	}
+
 }
