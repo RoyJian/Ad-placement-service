@@ -1,14 +1,30 @@
 package routes
 
-import "Ad_Placement_Service/routes/api/v1"
-import "github.com/gin-gonic/gin"
+import (
+	"go.uber.org/fx"
+)
 
-func RegisterRouter(r *gin.Engine) {
-	apiV1 := r.Group("/api/v1")
-	{
-		apiV1.GET("/health", v1.GetHealth)
-		apiV1.POST("/ad", v1.CreateAd)
-		apiV1.GET("/ad", v1.GetPlacementAd)
+// Routes contains multiple routes
+type Routes []Route
+
+// Route interface
+type Route interface {
+	Setup()
+}
+
+func NewRoute(adRoute *AdvertisementRoute, healthRoute *HealthRoute) *Routes {
+	return &Routes{adRoute, healthRoute}
+}
+
+var Module = fx.Options(
+	fx.Provide(NewRoute),
+	fx.Provide(NewAdvertisementRoute),
+	fx.Provide(NewHealthRoute),
+)
+
+// Setup all the route
+func (r Routes) Setup() {
+	for _, route := range r {
+		route.Setup()
 	}
-	return
 }
