@@ -14,7 +14,7 @@ func NewHealthRoute(handler *web.Gin) *HealthRoute {
 	return &HealthRoute{handler: handler}
 }
 
-func (h HealthRoute) Setup() {
+func (h *HealthRoute) Setup() {
 	h.handler.Gin.GET("/health", GetHealth)
 }
 

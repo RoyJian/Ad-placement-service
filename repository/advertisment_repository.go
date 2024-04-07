@@ -51,7 +51,9 @@ func (ar *AdvertisementRepository) Query(ctx context.Context, params domain.Plac
 	v, err, _ := ar.engine.Do(key, func() (interface{}, error) {
 		res, err := ar.queryFromDB(ctx, params)
 		// Write to cache
-		defer ar.writeToCache(ctx, key, res) // write query result to cache
+		if res != nil {
+			ar.writeToCache(ctx, key, res) // write query result to cache
+		}
 		return res, err
 	})
 	if err != nil {
