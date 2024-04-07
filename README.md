@@ -49,7 +49,7 @@
 ## 🚀 Quick Start
 啟動服務
 ```shell
-mv .env.template .env
+mv .env.example .env
 docker compose up -d --build 
 ```
 建立廣告
