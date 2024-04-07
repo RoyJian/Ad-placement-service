@@ -10,8 +10,8 @@ type AdminUseCase struct {
 	adRepository *repository.AdvertisementRepository
 }
 
-func (a AdminUseCase) Create(ctx context.Context, admin *domain.Admin) error {
-	return a.adRepository.Create(ctx, &admin.Advertisement)
+func (a *AdminUseCase) Create(ctx context.Context, admin *domain.Admin) error {
+	return a.adRepository.Create(ctx, admin.Advertisement)
 }
 
 func NewAdminUseCase(adRepository *repository.AdvertisementRepository) *AdminUseCase {

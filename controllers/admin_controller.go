@@ -23,7 +23,7 @@ func (ad *AdminController) Create(ctx *gin.Context) {
 			AgeEnd:   100,
 		},
 	}
-	admin := domain.Admin{Advertisement: advertisement}
+	admin := domain.Admin{Advertisement: &advertisement}
 	if err := ctx.ShouldBindWith(&advertisement, binding.JSON); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
 		return

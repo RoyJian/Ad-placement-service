@@ -3,7 +3,7 @@ package domain
 import "context"
 
 type Admin struct {
-	Advertisement Advertisement
+	Advertisement *Advertisement
 }
 
 type AdminUseCase interface {
