@@ -24,7 +24,7 @@
   ✦ feature:
     * 具有水平擴展的能力
     * 提升查詢效率
-    * 提供備援機制   
+    * 提供備援機制
   
   MongoDB Cluster 具有分散式與備援的機制，通過建立 Shard key 將資料依照 key 分配到對應的 Chunk，在此專案中採用了 compound index 作為 Shard key，
   依照`title` hash value 以及 `_id` 區間分成數個 Chunk，這可使查詢的速度提升。
@@ -40,8 +40,8 @@
     * 高可用性
     * 無中心化管理
     * 節點自動尋找
-    * 分散式儲存        
-
+    * 分散式儲存
+  
   Redis 作為資料庫快取可以提升查詢效率，考慮到讀取的次數遠大於寫入的次數以及廣告不會立即生效的特性，在快取策略上使用 Cache aside，
   實作上將查詢參數作為 key 並附加有效期限，減少資料不一致的問題。   
   Redis Cluster 沒有像 MongoDB Cluster 一樣有路由層(`Mongos`)，但具有感應能力，
