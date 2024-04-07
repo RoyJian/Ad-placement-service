@@ -8,7 +8,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o ad-placement-service .
 FROM alpine:edge
 WORKDIR /app
 COPY --from=build /app/ad-placement-service .
-COPY .env.release   ./.env
+COPY .env   ./.env
 ENV GIN_MODE=release
 ENTRYPOINT ["./ad-placement-service"]
 EXPOSE 3000

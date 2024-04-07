@@ -70,7 +70,7 @@ curl --location '127.0.0.1:3000/api/v1/ad' \
 ```
 查詢廣告
 ```shell
-curl --location '127.0.0.1:3000/api/v1/ad?limit=1&age=28&gender=M&country=TW&platform=web&offset=3' 
+curl --location '127.0.0.1:3000/api/v1/ad?limit=1&age=28&gender=M&country=TW&platform=web&offset=0' 
 ```
 關閉
 ```shell
